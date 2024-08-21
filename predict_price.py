@@ -14,6 +14,7 @@ def estimator(mileage, trained_theta, x, y):
     normalized_estimation = trained_theta[1] + (normalized_mileage * trained_theta[0])
     return denormalize_data(normalized_estimation, y.min(), y.max())
 
+
 if __name__ == "__main__":
     path = 'data.csv'
     data = pd.read_csv(path)
