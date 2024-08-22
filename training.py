@@ -81,6 +81,6 @@ if __name__ == "__main__":
     theta_final, cost_history = gradient_descent(X_scaled, y_scaled, theta, 0.1, iterations)
     
     predictions = model(X_scaled, theta_final)
-    print(my_r2_score(predictions, y_scaled))
+    print(my_r2_score(y_scaled, predictions))
     print(r2_score(y_scaled, predictions))
     plot_or_not()
