@@ -5,25 +5,24 @@ import seaborn as sns
 from sklearn.metrics import r2_score
 
 def model(X, theta):
-    return X.dot(theta)
+    return theta[0] + (theta[1] * X)
 
 
 def cost_function(X, y, theta):
     m = len(y)
-    return 1 / (2 * m) * np.sum((model(X, theta) - y) ** 2)
-
-
-def gradient(X, y, theta):
-    m = len(y)
-    return 1/m * X.T.dot(model(X, theta) - y) 
+    predictions = model(X, theta)
+    return 1 / (2 * m) * np.sum((predictions - y) ** 2)
 
 
 def gradient_descent(X, y, theta, learning_rate, iterations=1000):
+    m = len(y)
     cost_history = []
     for i in range(0, iterations):
         cost_history.append(cost_function(X, y, theta))
-        theta = theta - learning_rate * gradient(X, y, theta)
-
+        predictions = model(X, theta)
+        theta[0] -= learning_rate * (1/m) * np.sum(predictions - y)
+        theta[1] -= learning_rate * (1/m) * np.sum((predictions - y) * X)
+    
     with open('trained_theta.npy', 'wb') as file:
         np.save(file, theta)
     return theta, cost_history
@@ -41,7 +40,7 @@ def denormalize_data(normalized_value, min_val, max_val):
     return normalized_value * (max_val - min_val) + min_val
 
 
-def my_r2_score(y_hat, y):
+def my_r2_score(y, y_hat):
     SSR = np.sum((y - y_hat) ** 2)
     SST = np.sum((y - y.mean()) ** 2)
     return 1 - (SSR/SST)
@@ -56,8 +55,8 @@ def plot_or_not():
         print(e)
         return -1
     if user_input == 'y':
-            plt.scatter(denormalize_data(x_scaled, x.min(), x.max()), denormalize_data(y_scaled, y.min(), y.max()))
-            plt.plot(denormalize_data(x_scaled, x.min(), x.max()), denormalize_data(predictions, y.min(), y.max()), c='r')
+            plt.scatter(denormalize_data(X_scaled, X.min(), X.max()), denormalize_data(y_scaled, y.min(), y.max()))
+            plt.plot(denormalize_data(X_scaled, X.min(), X.max()), denormalize_data(predictions, y.min(), y.max()), c='r')
             plt.show()
             
             plt.plot(np.arange(0, iterations), cost_history)
@@ -70,25 +69,18 @@ if __name__ == "__main__":
     path = 'data.csv'
     data = pd.read_csv(path)
     
-    x = np.array(data['km'])
-    y = np.array(data['price'])
+    X = np.array(data['km']).flatten()
+    y = np.array(data['price']).flatten()
     
-    x = x.reshape(x.shape[0], 1)
-    y = y.reshape(y.shape[0], 1)
+    X_scaled, y_scaled = normalize_data(X, y)
+    print(X)
     
-    x_scaled, y_scaled = normalize_data(x, y)
-    X = np.hstack((x_scaled, np.ones(x.shape)))
-    
-    theta = np.array([0, 0])
-    theta = theta.reshape(theta.shape[0], 1)
-    
+    theta = np.zeros(2)
     
     iterations = 1200
-    theta_final, cost_history = gradient_descent(X, y_scaled, theta, 0.1, iterations)
+    theta_final, cost_history = gradient_descent(X_scaled, y_scaled, theta, 0.1, iterations)
     
-    print(theta_final)
-    
-    predictions = model(X, theta_final)    
+    predictions = model(X_scaled, theta_final)
     print(my_r2_score(predictions, y_scaled))
     print(r2_score(y_scaled, predictions))
     plot_or_not()
