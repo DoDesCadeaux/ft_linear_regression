@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.metrics import r2_score
 
 def model(X, theta):
     return theta[0] + (theta[1] * X)
@@ -82,5 +80,4 @@ if __name__ == "__main__":
     
     predictions = model(X_scaled, theta_final)
     print(my_r2_score(y_scaled, predictions))
-    print(r2_score(y_scaled, predictions))
     plot_or_not()
