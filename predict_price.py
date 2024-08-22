@@ -11,7 +11,7 @@ def denormalize_data(normalized_value, min_val, max_val):
 
 def estimator(mileage, trained_theta, x, y):
     normalized_mileage = normalize_data(mileage, x.min(), x.max())
-    normalized_estimation = trained_theta[1] + (normalized_mileage * trained_theta[0])
+    normalized_estimation = trained_theta[0] + (normalized_mileage * trained_theta[1])
     return denormalize_data(normalized_estimation, y.min(), y.max())
 
 
@@ -34,14 +34,13 @@ if __name__ == "__main__":
     except FileNotFoundError as e:
         print(e)
         exit(1)
-        
+
     estimation = estimator(mileage, trained_theta, x, y)
     try:
-        print(f"Estimation price for {mileage} km is {estimation[0]:.2f}$")
+        print(f"Estimation price for {mileage} km is {estimation:.2f}$")
     except IndexError as e:
         print("Theta is not trained or invalid")
 
-    theta = np.array([0, 0])
-    theta = theta.reshape(theta.shape[0], 1)
+    theta = np.zeros(2)
     with open('trained_theta.npy', 'wb') as file:
         np.save(file, theta)

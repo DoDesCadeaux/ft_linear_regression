@@ -73,12 +73,12 @@ if __name__ == "__main__":
     y = np.array(data['price']).flatten()
     
     X_scaled, y_scaled = normalize_data(X, y)
-    print(X)
     
     theta = np.zeros(2)
     
-    iterations = 1200
-    theta_final, cost_history = gradient_descent(X_scaled, y_scaled, theta, 0.1, iterations)
+    iterations = 20000
+    theta_final, cost_history = gradient_descent(X_scaled, y_scaled, theta, 0.01, iterations)
+    print(theta_final)
     
     predictions = model(X_scaled, theta_final)
     print(my_r2_score(y_scaled, predictions))
